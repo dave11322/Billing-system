@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block heading %}{{ title }}{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="msg error">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="grid2">
+    {% for f in form %}
+      <div class="field">{{ f.label_tag }}{{ f }}
+        {% if f.help_text %}<small class="muted">{{ f.help_text }}</small>{% endif %}
+        {% if f.errors %}<div class="err">{{ f.errors.0 }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    </div>
+    {% block extra %}{% endblock %}
+    <button class="btn" type="submit">Save</button>
+    <a class="btn ghost" href="{{ cancel }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

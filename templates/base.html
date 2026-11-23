@@ -1,0 +1,40 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Digital Billing System{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">&#9889; EnergyBill</div>
+    <nav>
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'customer_list' %}">Customers</a>
+      <a href="{% url 'reading_list' %}">Meter readings</a>
+      <a href="{% url 'bill_list' %}">Bills</a>
+      <a href="{% url 'payment_list' %}">Payments</a>
+      {% if role != 'billing' %}<a href="{% url 'reconciliation' %}">Reconciliation</a>{% endif %}
+      <a href="{% url 'reports' %}">Reports</a>
+      {% if role == 'admin' or role == 'management' %}<a href="{% url 'audit_log' %}">Audit trail</a>{% endif %}
+      {% if user.is_staff %}<a href="/admin/">Admin panel</a>{% endif %}
+    </nav>
+    <div class="userbox">
+      <strong>{{ user.username }}</strong><small>{{ role|title }}</small>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn small ghost-light" type="submit">Log out</button></form>
+    </div>
+  </aside>
+  <main class="content">
+    <header class="topbar"><h1>{% block heading %}{% endblock %}</h1><div class="actions">{% block actions %}{% endblock %}</div></header>
+    {% if messages %}<div class="messages">{% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}{% block auth %}{% endblock %}{% endif %}
+<script src="{% static 'js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sign in | Digital Billing System{% endblock %}
+{% block auth %}
+<div class="login-wrap">
+  <form method="post" class="card login">
+    <h2>&#9889; EnergyBill</h2>
+    <p class="muted">Digital Billing System for an Energy Company</p>
+    {% csrf_token %}
+    {% if form.errors %}<div class="msg error">Wrong username or password.</div>{% endif %}
+    <div class="field"><label for="id_username">Username</label><input type="text" name="username" id="id_username" autofocus required></div>
+    <div class="field"><label for="id_password">Password</label><input type="password" name="password" id="id_password" required></div>
+    <button class="btn block" type="submit">Sign in</button>
+  </form>
+</div>
+{% endblock %}

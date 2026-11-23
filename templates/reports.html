@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block heading %}Reports{% endblock %}
+{% block actions %}<a class="btn ghost" href="{% url 'export_bills' %}">Export bills (CSV)</a> <a class="btn ghost" href="{% url 'export_payments' %}">Export payments (CSV)</a>{% endblock %}
+{% block content %}
+<div class="cols">
+  <div class="card"><h3>Bills by status</h3><table><thead><tr><th>Status</th><th class="r">Count</th><th class="r">Total (KES)</th></tr></thead><tbody>
+    {% for s in by_status %}<tr><td><span class="badge {{ s.status|lower }}">{{ s.status }}</span></td><td class="r">{{ s.n }}</td><td class="r">{{ s.t|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="3" class="muted">No data.</td></tr>{% endfor %}</tbody></table></div>
+  <div class="card"><h3>Payments by method</h3><table><thead><tr><th>Method</th><th class="r">Count</th><th class="r">Total (KES)</th></tr></thead><tbody>
+    {% for m in by_method %}<tr><td>{{ m.method }}</td><td class="r">{{ m.n }}</td><td class="r">{{ m.t|floatformat:"2g" }}</td></tr>{% empty %}<tr><td colspan="3" class="muted">No data.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+<div class="card"><h3>Top 10 customers by outstanding balance</h3><table><thead><tr><th>Account</th><th>Customer</th><th class="r">Balance (KES)</th></tr></thead><tbody>
+  {% for c in top_debtors %}{% if c.balance > 0 %}<tr><td><a href="{% url 'customer_detail' c.pk %}">{{ c.account_number }}</a></td><td>{{ c.name }}</td><td class="r neg">{{ c.balance|floatformat:"2g" }}</td></tr>{% endif %}{% endfor %}</tbody></table></div>
+{% endblock %}

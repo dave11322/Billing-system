@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block heading %}Bill {{ b.number }}{% endblock %}
+{% block actions %}<button class="btn" onclick="window.print()">Print bill</button>{% endblock %}
+{% block content %}
+<div class="card invoice">
+  <div class="inv-head"><div><h2>&#9889; EnergyBill</h2><p class="muted">Electricity Bill</p></div>
+    <div class="r"><b>{{ b.number }}</b><br>Issued: {{ b.issue_date }}<br>Due: {{ b.due_date }}<br><span class="badge {{ b.status|lower }}">{{ b.get_status_display }}</span></div></div>
+  <p><b>{{ b.customer.name }}</b><br>Account: {{ b.customer.account_number }} | Meter: {{ b.customer.meter_number }}<br>{{ b.customer.address }}</p>
+  <table><thead><tr><th>Description</th><th class="r">Amount (KES)</th></tr></thead><tbody>
+    <tr><td>Billing month</td><td class="r">{{ b.period }}</td></tr>
+    <tr><td>Meter: {{ b.reading.previous_reading }} &rarr; {{ b.reading.current_reading }} = {{ b.units }} units</td><td class="r"></td></tr>
+    <tr><td>Energy charge ({{ b.units }} units x {{ b.rate }})</td><td class="r">{{ b.energy_charge|floatformat:"2g" }}</td></tr>
+    <tr><td>Fixed charge</td><td class="r">{{ b.fixed_charge|floatformat:"2g" }}</td></tr>
+    <tr><td>VAT ({{ b.customer.tariff.vat_percent }}%)</td><td class="r">{{ b.vat|floatformat:"2g" }}</td></tr>
+    <tr class="tot"><td>Total bill</td><td class="r">{{ b.total|floatformat:"2g" }}</td></tr>
+    <tr><td>Paid</td><td class="r">{{ b.paid|floatformat:"2g" }}</td></tr>
+    <tr class="tot"><td>Balance due</td><td class="r">{{ b.balance|floatformat:"2g" }}</td></tr>
+  </tbody></table>
+  <h3>Payments on this bill</h3>
+  <table><thead><tr><th>Reference</th><th>Date</th><th>Method</th><th class="r">Amount</th></tr></thead><tbody>
+  {% for p in payments %}<tr><td>{{ p.reference }}</td><td>{{ p.paid_on }}</td><td>{{ p.get_method_display }}</td><td class="r">{{ p.amount|floatformat:"2g" }}</td></tr>
+  {% empty %}<tr><td colspan="4" class="muted">No payments yet.</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

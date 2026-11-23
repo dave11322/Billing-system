@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block heading %}Payments{% endblock %}
+{% block actions %}{% if role == 'admin' or role == 'accounts' %}<a class="btn" href="{% url 'payment_create' %}">+ Record payment</a>{% endif %}{% endblock %}
+{% block content %}
+<div class="card"><input type="search" class="filter" data-filter="#payments" placeholder="Filter this table...">
+<table id="payments"><thead><tr><th>Reference</th><th>Date</th><th>Customer</th><th>Method</th><th class="r">Amount</th><th>Applied to</th></tr></thead><tbody>
+{% for p in payments %}<tr><td>{{ p.reference }}</td><td>{{ p.paid_on }}</td><td>{{ p.customer.name }}</td><td>{{ p.get_method_display }}</td><td class="r">{{ p.amount|floatformat:"2g" }}</td>
+<td>{% if p.bill %}<a href="{% url 'bill_detail' p.bill.pk %}">{{ p.bill.number }}</a>{% else %}<span class="badge overpaid">Unallocated</span>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="6" class="muted">No payments yet.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

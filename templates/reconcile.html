@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block heading %}Reconciliation{% endblock %}
+{% block content %}
+<div class="stats">
+  <div class="stat"><span>Total billed</span><b>{{ billed|floatformat:"2g" }}</b></div>
+  <div class="stat"><span>Total payments received</span><b>{{ paid|floatformat:"2g" }}</b></div>
+  <div class="stat warn"><span>Net outstanding</span><b>{{ outstanding|floatformat:"2g" }}</b></div>
+  <div class="stat {% if unallocated_total %}bad{% endif %}"><span>Unallocated payments</span><b>{{ unallocated_total|floatformat:"2g" }}</b></div>
+</div>
+<div class="card"><h3>1. Unallocated payments ({{ unallocated|length }})</h3>
+  <p class="muted">Payments received but not linked to any bill. Link each one to the correct bill.</p>
+  <table><thead><tr><th>Reference</th><th>Customer</th><th class="r">Amount</th><th>Link to bill</th></tr></thead><tbody>
+  {% for u in unallocated %}<tr><td>{{ u.p.reference }}</td><td>{{ u.p.customer.name }}</td><td class="r">{{ u.p.amount|floatformat:"2g" }}</td>
+    <td>{% if can_resolve %}{% if u.bills %}<form method="post" class="inline">{% csrf_token %}<input type="hidden" name="payment" value="{{ u.p.pk }}">
+      <select name="bill">{% for b in u.bills %}<option value="{{ b.pk }}">{{ b.number }} (balance {{ b.balance|floatformat:2 }})</option>{% endfor %}</select>
+      <button class="btn small">Link</button></form>{% else %}<span class="muted">No open bill for this customer</span>{% endif %}{% else %}<span class="muted">View only</span>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="4" class="ok">All payments are linked to bills.</td></tr>{% endfor %}</tbody></table></div>
+<div class="cols">
+  <div class="card"><h3>2. Overpaid bills ({{ overpaid|length }})</h3><table><thead><tr><th>Bill</th><th>Customer</th><th class="r">Credit</th></tr></thead><tbody>
+    {% for b in overpaid %}<tr><td><a href="{% url 'bill_detail' b.pk %}">{{ b.number }}</a></td><td>{{ b.customer.name }}</td><td class="r">{{ b.balance|floatformat:"2g" }}</td></tr>
+    {% empty %}<tr><td colspan="3" class="ok">None.</td></tr>{% endfor %}</tbody></table></div>
+  <div class="card"><h3>3. Overdue bills ({{ overdue|length }})</h3><table><thead><tr><th>Bill</th><th>Customer</th><th>Due</th><th class="r">Balance</th></tr></thead><tbody>
+    {% for b in overdue %}<tr><td><a href="{% url 'bill_detail' b.pk %}">{{ b.number }}</a></td><td>{{ b.customer.name }}</td><td>{{ b.due_date }}</td><td class="r neg">{{ b.balance|floatformat:"2g" }}</td></tr>
+    {% empty %}<tr><td colspan="4" class="ok">None.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

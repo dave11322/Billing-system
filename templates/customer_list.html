@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block heading %}Customers{% endblock %}
+{% block actions %}{% if role == 'admin' or role == 'billing' %}<a class="btn" href="{% url 'customer_create' %}">+ Register customer</a>{% endif %}{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="searchbar"><input type="search" name="q" value="{{ q }}" placeholder="Search name, account, meter or phone"><button class="btn small">Search</button></form>
+  <table><thead><tr><th>Account</th><th>Name</th><th>Meter</th><th>Tariff</th><th class="r">Balance (KES)</th><th>Status</th></tr></thead><tbody>
+  {% for c in customers %}<tr>
+    <td><a href="{% url 'customer_detail' c.pk %}">{{ c.account_number }}</a></td><td>{{ c.name }}</td><td>{{ c.meter_number }}</td><td>{{ c.tariff.name }}</td>
+    <td class="r {% if c.balance > 0 %}neg{% endif %}">{{ c.balance|floatformat:"2g" }}</td>
+    <td>{% if c.is_active %}<span class="badge paid">Active</span>{% else %}<span class="badge unpaid">Inactive</span>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6" class="muted">No customers found.</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

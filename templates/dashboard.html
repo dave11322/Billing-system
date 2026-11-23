@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="stats">
+  <div class="stat"><span>Active customers</span><b>{{ customers }}</b></div>
+  <div class="stat"><span>Total billed</span><b>KES {{ billed|floatformat:"2g" }}</b></div>
+  <div class="stat"><span>Total collected</span><b>KES {{ paid|floatformat:"2g" }}</b></div>
+  <div class="stat warn"><span>Outstanding</span><b>KES {{ outstanding|floatformat:"2g" }}</b></div>
+  <div class="stat"><span>Billed this month</span><b>KES {{ month_billed|floatformat:"2g" }}</b></div>
+  <div class="stat"><span>Collected this month</span><b>KES {{ month_paid|floatformat:"2g" }}</b></div>
+  <div class="stat {% if overdue %}bad{% endif %}"><span>Overdue bills</span><b>{{ overdue }}</b></div>
+  <div class="stat {% if unallocated %}bad{% endif %}"><span>Unallocated payments</span><b>{{ unallocated }}</b></div>
+</div>
+<div class="cols">
+  <div class="card"><h3>Recent bills</h3>
+    <table><thead><tr><th>Bill</th><th>Customer</th><th class="r">Total</th><th>Status</th></tr></thead><tbody>
+    {% for b in recent_bills %}<tr><td><a href="{% url 'bill_detail' b.pk %}">{{ b.number }}</a></td><td>{{ b.customer.name }}</td><td class="r">{{ b.total|floatformat:"2g" }}</td><td><span class="badge {{ b.status|lower }}">{{ b.get_status_display }}</span></td></tr>
+    {% empty %}<tr><td colspan="4" class="muted">No bills yet.</td></tr>{% endfor %}</tbody></table>
+  </div>
+  <div class="card"><h3>Recent payments</h3>
+    <table><thead><tr><th>Reference</th><th>Customer</th><th class="r">Amount</th><th>Date</th></tr></thead><tbody>
+    {% for p in recent_payments %}<tr><td>{{ p.reference }}</td><td>{{ p.customer.name }}</td><td class="r">{{ p.amount|floatformat:"2g" }}</td><td>{{ p.paid_on }}</td></tr>
+    {% empty %}<tr><td colspan="4" class="muted">No payments yet.</td></tr>{% endfor %}</tbody></table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block heading %}{{ c.name }} <small class="muted">{{ c.account_number }}</small>{% endblock %}
+{% block actions %}
+  {% if role == 'admin' or role == 'billing' %}<a class="btn ghost" href="{% url 'customer_edit' c.pk %}">Edit</a>{% endif %}
+  {% if role == 'admin' or role == 'accounts' %}<a class="btn" href="{% url 'payment_create' %}?customer={{ c.pk }}">Record payment</a>{% endif %}
+{% endblock %}
+{% block content %}
+<div class="stats">
+  <div class="stat"><span>Total billed</span><b>{{ c.total_billed|floatformat:"2g" }}</b></div>
+  <div class="stat"><span>Total paid</span><b>{{ c.total_paid|floatformat:"2g" }}</b></div>
+  <div class="stat {% if c.balance > 0 %}warn{% endif %}"><span>Balance (KES)</span><b>{{ c.balance|floatformat:"2g" }}</b></div>
+</div>
+<div class="card"><p><b>Meter:</b> {{ c.meter_number }} &nbsp; <b>Tariff:</b> {{ c.tariff.name }} &nbsp; <b>Phone:</b> {{ c.phone }} &nbsp; <b>Email:</b> {{ c.email|default:"-" }} &nbsp; <b>Address:</b> {{ c.address }}</p></div>
+<div class="cols">
+  <div class="card"><h3>Bills</h3><table><thead><tr><th>Bill</th><th>Period</th><th class="r">Total</th><th class="r">Balance</th><th>Status</th></tr></thead><tbody>
+    {% for b in bills %}<tr><td><a href="{% url 'bill_detail' b.pk %}">{{ b.number }}</a></td><td>{{ b.period }}</td><td class="r">{{ b.total|floatformat:"2g" }}</td><td class="r">{{ b.balance|floatformat:"2g" }}</td><td><span class="badge {{ b.status|lower }}">{{ b.get_status_display }}</span></td></tr>
+    {% empty %}<tr><td colspan="5" class="muted">No bills yet.</td></tr>{% endfor %}</tbody></table></div>
+  <div class="card"><h3>Payments</h3><table><thead><tr><th>Reference</th><th>Date</th><th class="r">Amount</th><th>Bill</th></tr></thead><tbody>
+    {% for p in payments %}<tr><td>{{ p.reference }}</td><td>{{ p.paid_on }}</td><td class="r">{{ p.amount|floatformat:"2g" }}</td><td>{{ p.bill.number|default:"Unallocated" }}</td></tr>
+    {% empty %}<tr><td colspan="4" class="muted">No payments yet.</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}
